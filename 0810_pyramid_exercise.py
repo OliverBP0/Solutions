@@ -48,7 +48,7 @@ def pyramid(lines):
 			print(f"{numbers[index]}", end=" ")
 			if index + 1 >= len(numbers):
 				break
-			if numbers[index] + numbers[index + 1] == current:
+			# if numbers[index] + numbers[index + 1] == current:
 
 		print()
 		numbers = next_list
