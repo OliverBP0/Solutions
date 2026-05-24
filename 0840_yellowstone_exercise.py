@@ -95,7 +95,7 @@ def prime_list(number):
 		test_number += 1
 	return primes
 
-def yellowstone(number):
+def yellowstone(number):  # Kan klart mærke og sikkert også se at det her kunne være lavet en del mere effektivt... men havde problemer nok med bare at få det til at du.
 	if number <= 3:
 		return list(range(1, number + 1))
 	numbers = [1, 2, 3]
