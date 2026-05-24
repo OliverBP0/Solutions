@@ -59,4 +59,5 @@ def pyramid(lines, firstline=None):
 		print()
 
 
-pyramid(10, [1, 3, 2])
+pyramid(10)
+# pyramid(10, [1, 3, 2])
