@@ -79,12 +79,9 @@ def relative_prime(number1, number2):
 	return not greatest_common_divisor(number1, number2) > 1
 
 def greatest_common_divisor(number1, number2):
-	common_divisor = 1
-	for x in get_factors(number1):
-		for y in get_factors(number2):
-			if x == y:
-				common_divisor = y
-	return common_divisor
+	while number2 != 0:
+		number1, number2 = number2, number1 % number2
+	return number1
 
 def prime_list(number):
 	primes = []
@@ -95,44 +92,55 @@ def prime_list(number):
 		test_number += 1
 	return primes
 
-def yellowstone(number):  # Kan klart mærke og sikkert også se at det her kunne være lavet en del mere effektivt... men havde problemer nok med bare at få det til at du.
-	if number <= 3:
-		return list(range(1, number + 1))
+def yellowstone(number):  # Versionen nedenunder er før jeg spurgte ChatGPT om hjælp, den duer stadig, men tog måske 6-8 minutter om at regne de første 1000 tal ud, dog ikke længere efter den primære performance fejl var med min GCD. Lad os bare sige jeg overkomplicerede det... Som altid.
 	numbers = [1, 2, 3]
+	used = set(numbers)
 	while len(numbers) < number:
-		relative = numbers[len(numbers) - 1]
-		legal_factors = get_factors(numbers[len(numbers) - 2], True)
-		multiplier = 1
-		smallest = None
+		start = 1
 		while True:
-			for factors in legal_factors:
-				if relative_prime(factors * multiplier, relative):
-					if factors * multiplier not in numbers:
-						if smallest is None:
-							smallest = factors * multiplier
-						elif factors * multiplier < smallest:
-							smallest = factors * multiplier
-			if smallest is not None:
-				new_smallest = None
-				for factors in legal_factors:
-					special_multiplier = 1
-					while True:
-						if relative_prime(factors * special_multiplier, relative):
-							if factors * special_multiplier not in numbers:
-								if new_smallest is None:
-									new_smallest = factors * special_multiplier
-								elif factors * special_multiplier < new_smallest:
-									new_smallest = factors * special_multiplier
-						special_multiplier += 1
-						if factors * special_multiplier >= smallest:
-							break
-				if new_smallest is not None and new_smallest < smallest:
-					smallest = new_smallest
-				numbers.append(smallest)
-				break
-			multiplier += 1
-	return numbers
+			if start not in used:
+				if greatest_common_divisor(start, numbers[-1]) == 1 and greatest_common_divisor(start, numbers[-2]) > 1:
+					numbers.append(start)
+					used.add(start)
+					break
+			start += 1
+	return numbers[:number]
+# def yellowstone(number):  # Kan klart mærke og sikkert også se at det her kunne være lavet en del mere effektivt... men havde problemer nok med bare at få det til at du.
+# 	numbers = [1, 2, 3]
+# 	while len(numbers) < number:
+# 		relative = numbers[len(numbers) - 1]
+# 		legal_factors = get_factors(numbers[len(numbers) - 2], True)
+# 		multiplier = 1
+# 		smallest = None
+# 		while True:
+# 			for factors in legal_factors:
+# 				if relative_prime(factors * multiplier, relative):
+# 					if factors * multiplier not in numbers:
+# 						if smallest is None:
+# 							smallest = factors * multiplier
+# 						elif factors * multiplier < smallest:
+# 							smallest = factors * multiplier
+# 			if smallest is not None:
+# 				new_smallest = None
+# 				for factors in legal_factors:
+# 					special_multiplier = 1
+# 					while True:
+# 						if relative_prime(factors * special_multiplier, relative):
+# 							if factors * special_multiplier not in numbers:
+# 								if new_smallest is None:
+# 									new_smallest = factors * special_multiplier
+# 								elif factors * special_multiplier < new_smallest:
+# 									new_smallest = factors * special_multiplier
+# 						special_multiplier += 1
+# 						if factors * special_multiplier >= smallest:
+# 							break
+# 				if new_smallest is not None and new_smallest < smallest:
+# 					smallest = new_smallest
+# 				numbers.append(smallest)
+# 				break
+# 			multiplier += 1
+# 	return numbers[:number]
 
 
-for a, b in enumerate(yellowstone(300)):
+for a, b in enumerate(yellowstone(15)):
 	print(a + 1, b)
