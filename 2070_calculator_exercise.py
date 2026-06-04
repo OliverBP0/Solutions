@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 class Calculator:
 
 	def __init__(self):
@@ -31,7 +32,7 @@ class Calculator:
 
 		self.action_label = tk.Label(self.result_frame, bg=self.gui_background_color, text=self.action_text, font=("Arial", 20), fg=self.action_color)
 		self.action_label.grid(row=0, column=0, pady=8, sticky="w")
-		self.result_label = tk.Label(self.result_frame, bg=self.gui_background_color, text=self.format_number(self.number[0]), font=("Arial", self.font_size), fg=self.text_color)
+		self.result_label = tk.Label(self.result_frame, bg=self.gui_background_color, text=str(self.format_number(self.number[0])), font=("Arial", self.font_size), fg=self.text_color)
 		self.result_label.grid(row=1, column=0, sticky="w")
 		self.set_result(self.number[0])
 
@@ -61,19 +62,19 @@ class Calculator:
 		self.button_0 = Button(self.button_frame, self.pixel, self.button_color, self.button_press_color, self.text_color, self.button_press_text_color, "0", lambda: self.button_press(17, 0))
 		self.button_komma = Button(self.button_frame, self.pixel, self.button_color, self.button_press_color, self.text_color, self.button_press_text_color, ",", lambda: self.button_press(18))
 		self.button_equals = Button(self.button_frame, self.pixel, self.equals_button_color, self.equals_button_press_color,
-							 self.equals_button_text_color, self.equals_button_press_text_color, "=", lambda: self.button_press(19))
+		                            self.equals_button_text_color, self.equals_button_press_text_color, "=", lambda: self.button_press(19))
 
-		# self.equals_frame = tk.Frame(self.gui, bg=self.gui_background_color, width=350, height=65)
-		# self.equals_frame.grid_propagate(False)
-		# self.equals_frame.grid(row=2, column=0)
-		# self.equals = Button(self.equals_frame, self.pixel, self.equals_button_color, self.equals_button_press_color, self.equals_button_text_color,
-		# 					 self.equals_button_press_text_color, "=", lambda: print("Test"), 350, 65, 80)
+	# self.equals_frame = tk.Frame(self.gui, bg=self.gui_background_color, width=350, height=65)
+	# self.equals_frame.grid_propagate(False)
+	# self.equals_frame.grid(row=2, column=0)
+	# self.equals = Button(self.equals_frame, self.pixel, self.equals_button_color, self.equals_button_press_color, self.equals_button_text_color,
+	# 					 self.equals_button_press_text_color, "=", lambda: print("Test"), 350, 65, 80)
 
 	def set_result(self, number):
 		formatted_num = str(self.format_number(number))
 		new_size = (30 - (len(formatted_num) - 15) * 2) if len(formatted_num) > 15 else 30
 		self.font_size = new_size if new_size > 15 else 15
-		self.result_label.configure(text=self.format_number(number), font=("Arial", self.font_size))
+		self.result_label.configure(text=str(self.format_number(number)), font=("Arial", self.font_size))
 
 	def set_action_text(self, action):
 		self.action_text = action
@@ -92,6 +93,7 @@ class Calculator:
 		except OverflowError:
 			self.action_color = "#ff0000"
 			self.set_action_text("Tallet er blevet for stort.")
+			raise OverflowError
 
 	def button_press(self, number, numbered_button=None):
 		if number == 0:
@@ -114,7 +116,7 @@ class Calculator:
 					if self.number[current_num] is None or len_number[current_num] < 2:
 						self.number[current_num] = 0
 					if len_number[current_num] > 1:
-						self.number[current_num] = float(str_number[current_num][:-1])
+						self.number[current_num] = float(str_number[current_num][:-1] if str_number[current_num][:-1] != "-" else "0")
 					self.set_result(self.number[current_num])
 					if self.number[0].is_integer():
 						self.number[0] = int(self.number[0])
@@ -153,6 +155,8 @@ class Calculator:
 						return
 					elif self.action != 0:
 						self.button_press(self.action)
+					else:
+						self.set_result(0)
 					self.action = number
 					self.set_action_text(f"{self.format_number(self.number[0])} {operator}")
 				case 19:
@@ -165,13 +169,15 @@ class Calculator:
 					self.number[current_num] *= -1
 					self.set_result(self.number[current_num])
 				case 18:
-					if not self.number[current_num].is_integer():
+					if "." in str_number[current_num]:
 						return
 					self.number[current_num] = str_number[current_num] + "."
 					self.comma = True
 				case _:
 					self.set_action_text("How did you do this...")
 		except Exception as error:
+			if isinstance(error, OverflowError):
+				return
 			self.action_color = "#ff0000"
 			self.set_action_text("Der er opstået en fejl.")
 			print(f"{type(error).__name__}: {error} (at line {error.__traceback__.tb_lineno})")
@@ -188,8 +194,8 @@ class Calculator:
 			case "+":
 				self.number[0] += number
 
-class Button:
 
+class Button:
 	instances = 0
 	horizontal_buttons = 4
 
@@ -203,10 +209,10 @@ class Button:
 		if text_size is None:
 			text_size = button_width // 2
 		self.button = tk.Button(frame, text=text, image=pixel, font=("Arial", text_size),
-								width=button_width, height=button_height, compound="center",
-								bd=0, bg=background_color, activebackground=focused_color,
-								anchor="center", relief="flat", fg=text_color,
-								activeforeground=focused_text_color, command=command)
+		                        width=button_width, height=button_height, compound="center",
+		                        bd=0, bg=background_color, activebackground=focused_color,
+		                        anchor="center", relief="flat", fg=text_color,
+		                        activeforeground=focused_text_color, command=command)
 		self.button.grid(row=row, column=column)
 		Button.instances += 1
 
