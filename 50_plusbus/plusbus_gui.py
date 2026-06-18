@@ -27,7 +27,7 @@ class Plusbus:
 		self.gui.geometry("1200x700")
 		self.gui.configure(bg=self.gui_background_color)
 
-		#  Account login / Create account
+		#  Account login
 
 		self.acc_frame = tk.Frame(self.gui, bg=self.gui_background_color)
 		self.acc_frame.place(relx=0.5, rely=0.5, anchor="center")
