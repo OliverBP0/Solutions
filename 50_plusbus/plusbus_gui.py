@@ -198,12 +198,69 @@ class Plusbus:
 													activebackground=self.button_press_color, font=("Arial", 20), command=self.rediger_rejse)
 		self.admin_rediger_rejse_button.grid(row=0, column=3, padx=(0, 30))
 
+		self.admin_tjek_rejse_button = tk.Button(self.admin_button_frame, text="Tjek rejse", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
+													activebackground=self.button_press_color, font=("Arial", 20), command=self.tjek_rejse)
+		self.admin_tjek_rejse_button.grid(row=0, column=4, padx=(0, 30))
+
 		self.admin_kunder_button = tk.Button(self.admin_button_frame, text="Kunder", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
 													activebackground=self.button_press_color, font=("Arial", 20), command=lambda: self.change_window(self.admin_kunder_frame))
-		self.admin_kunder_button.grid(row=0, column=4)
+		self.admin_kunder_button.grid(row=0, column=5)
 
 		self.acc_create_label_frame_label_error = tk.Label(self.admin_frame, text="", bg=self.gui_background_color, fg=self.error_color, font=("Arial", 30))
 		self.acc_create_label_frame_label_error.grid(row=4, column=0, pady=(30, 0))
+
+		# Admin tjek rejse menu
+
+		self.admin_tjek_rejse_frame = tk.Frame(self.gui, bg=self.gui_background_color)
+
+		self.admin_tjek_rejse_label_1 = tk.Label(self.admin_tjek_rejse_frame, text="", bg=self.gui_background_color, fg=self.text_color, font=("Arial", 25))
+		self.admin_tjek_rejse_label_1.grid(row=0, column=0)
+		self.admin_tjek_rejse_label_2 = tk.Label(self.admin_tjek_rejse_frame, text="", bg=self.gui_background_color, fg=self.text_color, font=("Arial", 25))
+		self.admin_tjek_rejse_label_2.grid(row=1, column=0, pady=(10, 0))
+		self.admin_tjek_rejse_label_3 = tk.Label(self.admin_tjek_rejse_frame, text="", bg=self.gui_background_color, fg=self.text_color, font=("Arial", 25))
+		self.admin_tjek_rejse_label_3.grid(row=2, column=0)
+		self.admin_tjek_rejse_label_4 = tk.Label(self.admin_tjek_rejse_frame, text="", bg=self.gui_background_color, fg=self.text_color, font=("Arial", 25))
+		self.admin_tjek_rejse_label_4.grid(row=3, column=0)
+		self.admin_tjek_rejse_label_5 = tk.Label(self.admin_tjek_rejse_frame, text="", bg=self.gui_background_color, fg=self.text_color, font=("Arial", 25))
+		self.admin_tjek_rejse_label_5.grid(row=4, column=0)
+
+		self.admin_tjek_rejse_treeview_frame = tk.Frame(self.admin_tjek_rejse_frame, bg=self.gui_background_color)
+		self.admin_tjek_rejse_treeview_frame.grid(row=5, column=0)
+
+		self.admin_tjek_rejse_scrollbar = tk.Scrollbar(self.admin_tjek_rejse_treeview_frame)
+		self.admin_tjek_rejse_scrollbar.grid(row=0, column=1, pady=(30, 0), sticky="ns")
+		self.admin_tjek_rejse_treeview = ttk.Treeview(self.admin_tjek_rejse_treeview_frame, yscrollcommand=self.admin_tjek_rejse_scrollbar.set, selectmode="browse")
+		self.admin_tjek_rejse_treeview.grid(row=0, column=0, pady=(30, 0))
+		self.admin_tjek_rejse_scrollbar.config(command=self.admin_tjek_rejse_treeview.yview)
+
+		self.admin_tjek_rejse_treeview['columns'] = ("id", "efternavn", "kontakt", "pladserbooket")
+		self.admin_tjek_rejse_treeview.column("#0", width=0, stretch=tk.NO)
+		self.admin_tjek_rejse_treeview.column("id", width=50, anchor="w")
+		self.admin_tjek_rejse_treeview.column("efternavn", width=125, anchor="w")
+		self.admin_tjek_rejse_treeview.column("kontakt", width=125, anchor="w")
+		self.admin_tjek_rejse_treeview.column("pladserbooket", width=145, anchor="w")
+
+		self.admin_tjek_rejse_treeview.heading("#0", text="", anchor="w")
+		self.admin_tjek_rejse_treeview.heading("id", text="Id", anchor="center")
+		self.admin_tjek_rejse_treeview.heading("efternavn", text="Efternavn", anchor="center")
+		self.admin_tjek_rejse_treeview.heading("kontakt", text="Kontakt", anchor="center")
+		self.admin_tjek_rejse_treeview.heading("pladserbooket", text="Pladser booket", anchor="center")
+
+		self.admin_tjek_rejse_treeview.tag_configure("evenrow", background=self.evenrow_background, foreground=self.text_color)
+		self.admin_tjek_rejse_treeview.tag_configure("oddrow", background=self.oddrow_background, foreground=self.text_color)
+
+		self.admin_tjek_rejse_treeview.bind("<ButtonRelease-1>", lambda event: self.select_id(self.admin_tjek_rejse_treeview, "kundeid_admin_unbook"))
+
+		self.admin_tjek_rejse_button_frame = tk.Frame(self.admin_tjek_rejse_frame, bg=self.gui_background_color)
+		self.admin_tjek_rejse_button_frame.grid(row=6, column=0, pady=(30, 0))
+
+		self.admin_kunder_back_button = tk.Button(self.admin_tjek_rejse_button_frame, text="Tilbage", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
+												  activebackground=self.button_press_color, font=("Arial", 20), command=lambda: self.change_window(self.admin_frame))
+		self.admin_kunder_back_button.grid(row=0, column=0, padx=(0, 30))
+
+		self.admin_tjek_rejse_unbook_button = tk.Button(self.admin_tjek_rejse_button_frame, text="Unbook", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
+												  activebackground=self.button_press_color, font=("Arial", 20), command=self.unbook_rejse)
+		self.admin_tjek_rejse_unbook_button.grid(row=0, column=1)
 
 		# Admin kunder menu
 
@@ -482,6 +539,18 @@ class Plusbus:
 		self.rediger_kunde_rejse_button_frame_label_missing_info = tk.Label(self.rediger_kunde_rejse, text="", bg=self.gui_background_color, fg=self.error_color, font=("Arial", 50))
 		self.rediger_kunde_rejse_button_frame_label_missing_info.grid(row=7, column=0, pady=(30, 0))
 
+	def tjek_rejse(self):
+		if not self.selected[1] == "rejseid" or self.selected[0] == -1:
+			return
+		rejse = pbdb.get_record(pbd.Rejse, self.selected[0])
+		self.admin_tjek_rejse_label_1.configure(text="Rejse id: " + str(rejse.id))
+		self.admin_tjek_rejse_label_2.configure(text="Rute: " + rejse.rute)
+		self.admin_tjek_rejse_label_3.configure(text="Dato: " + rejse.dato)
+		self.admin_tjek_rejse_label_4.configure(text="Pladskapacitet: " + str(rejse.pladskapacitet))
+		self.admin_tjek_rejse_label_5.configure(text="Pladser tilbage: " + str(pbdb.get_remaining_slots(rejse.id)))
+		refresh_treeview_norecord(self.admin_tjek_rejse_treeview, pbdb.get_admin_kunde_booket(rejse.id))
+		self.change_window(self.admin_tjek_rejse_frame)
+
 	def kunde_back_button(self):
 		if self.admin_login:
 			self.kundeid = self.selected[0]
@@ -587,12 +656,17 @@ class Plusbus:
 		self.change_window(self.rediger_rejse_frame)
 
 	def unbook_rejse(self):
-		if not self.selected[1] == "bookingid" or self.selected[0] == -1:
+		if (not self.selected[1] == "bookingid" and not self.selected[1] == "kundeid_admin_unbook") or self.selected[0] == -1:
 			return
-		pbdb.soft_delete_booking(pbdb.get_record(pbd.Booking, self.selected[0]))
+		booking = pbdb.get_record(pbd.Booking, self.selected[0])
+		pbdb.soft_delete_booking(booking)
+		refresh_treeview_norecord(self.admin_tjek_rejse_treeview, pbdb.get_admin_kunde_booket(booking.rejseid))
+		if not self.selected[1] == "kundeid_admin_unbook":
+			self.refresh_booking_treeview()
+			self.refresh_available_rejser_treeview()
+		else:
+			self.admin_tjek_rejse_label_5.configure(text="Pladser tilbage: " + str(pbdb.get_remaining_slots(booking.rejseid)))
 		self.selected = [-1, "", 0]
-		self.refresh_booking_treeview()
-		self.refresh_available_rejser_treeview()
 		refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 
 	def book_rejse(self, pladser=None):

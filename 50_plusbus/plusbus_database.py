@@ -36,6 +36,15 @@ def get_remaining_slots(id_):
 			slots -= (bookinger.pladser if bookinger.pladser > 0 else 0)
 	return slots
 
+def get_admin_kunde_booket(rejseid):
+	result = []
+	for record in get_all_rejse_bookinger(rejseid):
+		if record.valid():
+			kunde = get_record(Kunde, record.kundeid)
+			build_list = (record.id, kunde.efternavn, kunde.kontakt, record.pladser)
+			result.append(build_list)
+	return result
+
 def get_admin_rejser():
 	with Session(engine) as session:
 		records = session.scalars(select(Rejse))
