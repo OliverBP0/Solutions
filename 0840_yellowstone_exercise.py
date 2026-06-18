@@ -142,5 +142,5 @@ def yellowstone(number):  # Versionen nedenunder er før jeg spurgte ChatGPT om 
 # 	return numbers[:number]
 
 
-for a, b in enumerate(yellowstone(15)):
+for a, b in enumerate(yellowstone(1000)):
 	print(a + 1, b)

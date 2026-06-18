@@ -19,6 +19,7 @@ class Plusbus:
 		self.row_height = 20
 		self.kundeid = -1
 		self.auth = 0
+		self.admin_login = False
 		self.selected = [-1, "", 0]
 
 		self.gui = tk.Tk()
@@ -135,25 +136,27 @@ class Plusbus:
 		self.admin_treeview.grid(row=0, column=0, pady=(30, 0))
 		self.admin_scrollbar.config(command=self.admin_treeview.yview)
 
-		self.admin_treeview['columns'] = ("id", "rute", "dato", "pladskapacitet")
+		self.admin_treeview['columns'] = ("id", "rute", "dato", "pladskapacitet", "pladserbooket")
 		self.admin_treeview.column("#0", width=0, stretch=tk.NO)
 		self.admin_treeview.column("id", width=50, anchor="w")
 		self.admin_treeview.column("rute", width=125, anchor="w")
 		self.admin_treeview.column("dato", width=125, anchor="w")
 		self.admin_treeview.column("pladskapacitet", width=150, anchor="w")
+		self.admin_treeview.column("pladserbooket", width=145, anchor="w")
 
 		self.admin_treeview.heading("#0", text="", anchor="w")
 		self.admin_treeview.heading("id", text="Id", anchor="center")
 		self.admin_treeview.heading("rute", text="Rute", anchor="center")
 		self.admin_treeview.heading("dato", text="Dato", anchor="center")
 		self.admin_treeview.heading("pladskapacitet", text="Pladskapacitet", anchor="center")
+		self.admin_treeview.heading("pladserbooket", text="Plads tilbage", anchor="center")
 
 		self.admin_treeview.tag_configure("evenrow", background=self.evenrow_background, foreground=self.text_color)
 		self.admin_treeview.tag_configure("oddrow", background=self.oddrow_background, foreground=self.text_color)
 
 		self.admin_treeview.bind("<ButtonRelease-1>", lambda event: self.select_id(self.admin_treeview, "rejseid"))
 
-		fill_treeview(self.admin_treeview, pbdb.select_all(pbd.Rejse))
+		fill_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 
 		self.admin_entry_frame = tk.Frame(self.admin_frame, bg=self.gui_background_color)
 		self.admin_entry_frame.grid(row=2, column=0)
@@ -193,10 +196,60 @@ class Plusbus:
 
 		self.admin_rediger_rejse_button = tk.Button(self.admin_button_frame, text="Rediger rejse", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
 													activebackground=self.button_press_color, font=("Arial", 20), command=self.rediger_rejse)
-		self.admin_rediger_rejse_button.grid(row=0, column=3)
+		self.admin_rediger_rejse_button.grid(row=0, column=3, padx=(0, 30))
+
+		self.admin_kunder_button = tk.Button(self.admin_button_frame, text="Kunder", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
+													activebackground=self.button_press_color, font=("Arial", 20), command=lambda: self.change_window(self.admin_kunder_frame))
+		self.admin_kunder_button.grid(row=0, column=4)
 
 		self.acc_create_label_frame_label_error = tk.Label(self.admin_frame, text="", bg=self.gui_background_color, fg=self.error_color, font=("Arial", 30))
 		self.acc_create_label_frame_label_error.grid(row=4, column=0, pady=(30, 0))
+
+		# Admin kunder menu
+
+		self.admin_kunder_frame = tk.Frame(self.gui, bg=self.gui_background_color)
+
+		self.admin_kunder_treeview_frame = tk.Frame(self.admin_kunder_frame, bg=self.gui_background_color)
+		self.admin_kunder_treeview_frame.grid(row=0, column=0)
+
+		self.admin_kunder_scrollbar = tk.Scrollbar(self.admin_kunder_treeview_frame)
+		self.admin_kunder_scrollbar.grid(row=0, column=1, pady=(30, 0), sticky="ns")
+		self.admin_kunder_treeview = ttk.Treeview(self.admin_kunder_treeview_frame, yscrollcommand=self.admin_kunder_scrollbar.set, selectmode="browse")
+		self.admin_kunder_treeview.grid(row=0, column=0, pady=(30, 0))
+		self.admin_kunder_scrollbar.config(command=self.admin_kunder_treeview.yview)
+
+		self.admin_kunder_treeview['columns'] = ("id", "efternavn", "kontakt", "auth")
+		self.admin_kunder_treeview.column("#0", width=0, stretch=tk.NO)
+		self.admin_kunder_treeview.column("id", width=50, anchor="w")
+		self.admin_kunder_treeview.column("efternavn", width=125, anchor="w")
+		self.admin_kunder_treeview.column("kontakt", width=125, anchor="w")
+		self.admin_kunder_treeview.column("auth", width=35, anchor="w")
+
+		self.admin_kunder_treeview.heading("#0", text="", anchor="w")
+		self.admin_kunder_treeview.heading("id", text="Id", anchor="center")
+		self.admin_kunder_treeview.heading("efternavn", text="Efternavn", anchor="center")
+		self.admin_kunder_treeview.heading("kontakt", text="Kontakt", anchor="center")
+		self.admin_kunder_treeview.heading("auth", text="Auth", anchor="center")
+
+		self.admin_kunder_treeview.tag_configure("evenrow", background=self.evenrow_background, foreground=self.text_color)
+		self.admin_kunder_treeview.tag_configure("oddrow", background=self.oddrow_background, foreground=self.text_color)
+
+		self.admin_kunder_treeview.bind("<ButtonRelease-1>", lambda event: self.select_id(self.admin_kunder_treeview, "kundeid_admin"))
+
+		self.admin_kunder_button_frame = tk.Frame(self.admin_kunder_frame, bg=self.gui_background_color)
+		self.admin_kunder_button_frame.grid(row=1, column=0, pady=(30, 0))
+
+		self.admin_kunder_back_button = tk.Button(self.admin_kunder_button_frame, text="Tilbage", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
+										   activebackground=self.button_press_color, font=("Arial", 20), command=lambda: self.change_window(self.admin_frame))
+		self.admin_kunder_back_button.grid(row=0, column=0, padx=(0, 30))
+
+		self.admin_kunder_login_button = tk.Button(self.admin_kunder_button_frame, text="Login", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
+										   activebackground=self.button_press_color, font=("Arial", 20), command=self.login)
+		self.admin_kunder_login_button.grid(row=0, column=1)
+
+		admin_kunder_kunder = pbdb.select_all(pbd.Kunde)
+		admin_kunder_kunder.remove(admin_kunder_kunder[0])
+		fill_treeview(self.admin_kunder_treeview, admin_kunder_kunder)
 
 		# Rediger rejse menu
 
@@ -224,7 +277,7 @@ class Plusbus:
 		self.rediger_rejse_button_frame = tk.Frame(self.rediger_rejse_frame, bg=self.gui_background_color)
 		self.rediger_rejse_button_frame.grid(row=2, column=0)
 
-		self.rediger_rejse_back_button = tk.Button(self.rediger_rejse_button_frame, text="Annuller", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
+		self.rediger_rejse_back_button = tk.Button(self.rediger_rejse_button_frame, text="Tilbage", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
 												   activebackground=self.button_press_color, font=("Arial", 20), command=lambda: self.change_window(self.admin_frame))
 		self.rediger_rejse_back_button.grid(row=0, column=0, pady=(30, 0), padx=(0, 30))
 
@@ -311,7 +364,7 @@ class Plusbus:
 		self.kunde_frame_buttons.grid(row=1, column=0, pady=(30, 0))
 
 		self.kunde_frame_back_button = tk.Button(self.kunde_frame_buttons, text="Tilbage", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
-												 activebackground=self.button_press_color, font=("Arial", 20), command=lambda: self.change_window(self.acc_frame))
+												 activebackground=self.button_press_color, font=("Arial", 20), command=self.kunde_back_button)
 		self.kunde_frame_back_button.grid(row=1, column=0, padx=(0, 30))
 
 		self.kunde_frame_book_rejse_button = tk.Button(self.kunde_frame_buttons, text="Book rejse", relief="flat", bg=self.secondary_bg_color, fg=self.text_color,
@@ -429,12 +482,22 @@ class Plusbus:
 		self.rediger_kunde_rejse_button_frame_label_missing_info = tk.Label(self.rediger_kunde_rejse, text="", bg=self.gui_background_color, fg=self.error_color, font=("Arial", 50))
 		self.rediger_kunde_rejse_button_frame_label_missing_info.grid(row=7, column=0, pady=(30, 0))
 
+	def kunde_back_button(self):
+		if self.admin_login:
+			self.kundeid = self.selected[0]
+			self.auth = self.selected[2]
+			self.selected = [-1, "", 0]
+			self.admin_login = False
+			self.change_window(self.admin_kunder_frame)
+			return
+		self.change_window(self.acc_frame)
+
 	def kunde_rediger_rejse(self, pladser=None):
 		if not self.selected[1] == "bookingid" or self.selected[0] == -1:
 			return
 		booking = pbdb.get_record(pbd.Booking, self.selected[0])
 		rejse = pbdb.get_record(pbd.Rejse, booking.rejseid)
-		remaining = get_remaining_slots(booking.rejseid) + booking.pladser
+		remaining = pbdb.get_remaining_slots(booking.rejseid) + booking.pladser
 		if pladser is None:
 			self.rediger_kunde_rejse_label_1.configure(text="Rejse id: " + str(rejse.id))
 			self.rediger_kunde_rejse_label_2.configure(text="Rute: " + rejse.rute)
@@ -460,6 +523,7 @@ class Plusbus:
 			self.rediger_kunde_rejse_button_frame_label_missing_info.configure(text="")
 			self.rediger_kunde_rejse_entry_pladser.delete(0, tk.END)
 			self.refresh_booking_treeview()
+			refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 			self.selected = [-1, "", 0]
 			self.change_window(self.kunde_frame)
 
@@ -468,7 +532,18 @@ class Plusbus:
 		for bookinger in pbdb.get_all_bookinger(self.kundeid):
 			pbdb.soft_delete_booking(bookinger)
 		self.selected = [-1, "", 0]
-		refresh_treeview(self.acc_treeview, pbdb.select_all(pbd.Kunde))
+		kunder = pbdb.select_all(pbd.Kunde)
+		refresh_treeview(self.acc_treeview, kunder)
+		kunder.remove(kunder[0])
+		refresh_treeview(self.admin_kunder_treeview, kunder)
+		refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
+		if self.admin_login:
+			self.kundeid = self.selected[0]
+			self.auth = self.selected[2]
+			self.selected = [-1, "", 0]
+			self.admin_login = False
+			self.change_window(self.admin_kunder_frame)
+			return
 		self.change_window(self.acc_frame)
 
 	def save_account(self):
@@ -496,7 +571,7 @@ class Plusbus:
 			return
 		self.rediger_rejse_label_missing_info.configure(text="Saved", fg=self.successful_color)
 		pbdb.change_rejse_data(self.selected[0], self.rediger_rejse_entry_1.get(), self.rediger_rejse_entry_2.get(), plads)
-		refresh_treeview(self.admin_treeview, pbdb.select_all(pbd.Rejse))
+		refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 
 	def rediger_rejse(self):
 		if not self.selected[1] == "rejseid" or self.selected[0] == -1:
@@ -518,12 +593,13 @@ class Plusbus:
 		self.selected = [-1, "", 0]
 		self.refresh_booking_treeview()
 		self.refresh_available_rejser_treeview()
+		refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 
 	def book_rejse(self, pladser=None):
 		if not self.selected[1] == "bookrejse" or self.selected[0] == -1:
 			return
 		rejse = pbdb.get_record(pbd.Rejse, self.selected[0])
-		remaining = get_remaining_slots(rejse.id)
+		remaining = pbdb.get_remaining_slots(rejse.id)
 		if pladser is None:
 			self.kunde_book_rejse_label_1.configure(text="Rejse id: " + str(rejse.id))
 			self.kunde_book_rejse_label_2.configure(text="Rute: " + rejse.rute)
@@ -550,6 +626,7 @@ class Plusbus:
 			self.kunde_book_rejse_entry_pladser.delete(0, tk.END)
 			self.refresh_available_rejser_treeview()
 			self.refresh_booking_treeview()
+			refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 			self.selected = [-1, "", 0]
 			self.change_window(self.kunde_frame)
 
@@ -588,7 +665,7 @@ class Plusbus:
 			if booking.valid():
 				bookederejser.append(booking.rejseid)
 		for rejse in rejser:
-			remaining = get_remaining_slots(rejse.id)
+			remaining = pbdb.get_remaining_slots(rejse.id)
 			if remaining > 0 and rejse.id not in bookederejser:
 				rejse.pladskapacitet = remaining
 				rejselist.append(rejse)
@@ -601,7 +678,7 @@ class Plusbus:
 		for bookinger in pbdb.get_all_rejse_bookinger(self.selected[0]):
 			pbdb.soft_delete_booking(bookinger)
 		self.selected = [-1, "", 0]
-		refresh_treeview(self.admin_treeview, pbdb.select_all(pbd.Rejse))
+		refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 
 	def opret_rejse(self):
 		rute = self.admin_entry_frame_rute_entry.get()
@@ -615,15 +692,19 @@ class Plusbus:
 		except ValueError:
 			self.acc_create_label_frame_label_error.configure(text="Pladskapacitet skal være et tal!")
 			return
-		refresh_treeview(self.admin_treeview, pbdb.select_all(pbd.Rejse))
+		refresh_treeview_norecord(self.admin_treeview, pbdb.get_admin_rejser())
 		self.acc_create_label_frame_label_error.configure(text="")
 		self.admin_entry_frame_rute_entry.delete(0, tk.END)
 		self.admin_entry_frame_dato_entry.delete(0, tk.END)
 		self.admin_entry_frame_pladskapacitet_entry.delete(0, tk.END)
 
 	def login(self):
-		if not self.selected[1] == "kundeid" or self.selected[0] == -1:
+		if (not self.selected[1] == "kundeid" and not self.selected[1] == "kundeid_admin") or self.selected[0] == -1:
 			return
+		if self.selected[1] == "kundeid_admin":
+			self.admin_login = True
+		else:
+			self.admin_login = False
 		self.kundeid = self.selected[0]
 		self.auth = self.selected[2]
 		self.selected = [-1, "", 0]
@@ -649,7 +730,10 @@ class Plusbus:
 		self.acc_create_label_frame_entry_kontaktinfo.delete(0, tk.END)
 		self.acc_create_label_frame_label_missing_info.configure(text="")
 		self.kundeid = pbdb.insert_data(pbd.Kunde(efternavn=efternavn, kontakt=kontaktinfo, auth=pbd.PermissionLevel.LOW))
-		refresh_treeview(self.acc_treeview, pbdb.select_all(pbd.Kunde))
+		kunder = pbdb.select_all(pbd.Kunde)
+		refresh_treeview(self.acc_treeview, kunder)
+		kunder.remove(kunder[0])
+		refresh_treeview(self.admin_kunder_treeview, kunder)
 		self.selected = [self.kundeid, "kundeid", 0]
 		self.login()
 
@@ -661,22 +745,28 @@ class Plusbus:
 		self.selected = [int(values[0]), type_, int(values[3])]
 
 
-def get_remaining_slots(id_):
-	rejse = pbdb.get_record(pbd.Rejse, id_)
-	slots = rejse.pladskapacitet
-	for bookinger in pbdb.get_all_rejse_bookinger(rejse.id):
-		if bookinger.valid():
-			slots -= (bookinger.pladser if bookinger.pladser > 0 else 0)
-	return slots
-
-
 def empty_treeview(treeview):
 	treeview.delete(*treeview.get_children())
+
+
+def refresh_treeview_norecord(treeview, values):
+	empty_treeview(treeview)
+	fill_treeview_norecord(treeview, values)
 
 
 def refresh_treeview(treeview, values, cond1=()):
 	empty_treeview(treeview)
 	fill_treeview(treeview, values, cond1)
+
+
+def fill_treeview_norecord(treeview, values):
+	count = 0
+	for records in values:
+		if count % 2 == 0:
+			treeview.insert(parent='', index='end', text='', values=records, tags='evenrow')
+		else:
+			treeview.insert(parent='', index='end', text='', values=records, tags='oddrow')
+		count += 1
 
 
 def fill_treeview(treeview, values, cond1=()):
@@ -685,9 +775,9 @@ def fill_treeview(treeview, values, cond1=()):
 		if records.valid():
 			if records not in cond1:
 				if count % 2 == 0:
-					treeview.insert(parent='', index='end', text='', values=records.convert_to_tuple(), tags='evenrow')
+					treeview.insert(parent='', index='end', text='', values=records.convert_to_list(), tags='evenrow')
 				else:
-					treeview.insert(parent='', index='end', text='', values=records.convert_to_tuple(), tags='oddrow')
+					treeview.insert(parent='', index='end', text='', values=records.convert_to_list(), tags='oddrow')
 				count += 1
 
 

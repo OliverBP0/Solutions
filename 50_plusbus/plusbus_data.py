@@ -14,8 +14,8 @@ class Kunde(Base):
 	def __repr__(self):
 		return f"Kunde({self.id=}    {self.efternavn=}    {self.kontakt=}    {self.auth=})"
 
-	def convert_to_tuple(self):
-		return self.id, self.efternavn, self.kontakt, self.auth
+	def convert_to_list(self):
+		return [self.id, self.efternavn, self.kontakt, self.auth]
 
 	def valid(self):
 		try:
@@ -34,8 +34,8 @@ class Rejse(Base):
 	def __repr__(self):
 		return f"Rejse({self.id=}    {self.rute=}    {self.dato=}    {self.pladskapacitet=})"
 
-	def convert_to_tuple(self):
-		return self.id, self.rute, self.dato, self.pladskapacitet
+	def convert_to_list(self):
+		return [self.id, self.rute, self.dato, self.pladskapacitet]
 
 	def valid(self):
 		try:
@@ -54,8 +54,8 @@ class Booking(Base):
 	def __repr__(self):
 		return f"Booking({self.id=}    {self.rejseid=}    {self.kundeid=}    {self.pladser=})"
 
-	def convert_to_tuple(self):
-		return self.id, self.rejseid, self.kundeid, self.pladser
+	def convert_to_list(self):
+		return [self.id, self.rejseid, self.kundeid, self.pladser]
 
 	def valid(self):
 		try:

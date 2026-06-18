@@ -100,4 +100,4 @@ def calc_lunar_primes(n):  # Jeg er helt stumped på hvordan i alverden lunar pr
 
 print(Lunar_int(43) + Lunar_int(16))  # Burde være 46
 print(Lunar_int(8738) * Lunar_int(63265))  # Burde være 66366565
-print(calc_lunar_primes(30))
+print(calc_lunar_primes(50))

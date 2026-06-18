@@ -28,6 +28,25 @@ def change_account_data(id_, efternavn, kontaktinfo):
 		session.execute(update(Kunde).where(Kunde.id == id_).values(efternavn=efternavn, kontakt=kontaktinfo))
 		session.commit()
 
+def get_remaining_slots(id_):
+	rejse = get_record(Rejse, id_)
+	slots = rejse.pladskapacitet
+	for bookinger in get_all_rejse_bookinger(rejse.id):
+		if bookinger.valid():
+			slots -= (bookinger.pladser if bookinger.pladser > 0 else 0)
+	return slots
+
+def get_admin_rejser():
+	with Session(engine) as session:
+		records = session.scalars(select(Rejse))
+		result = []
+		for record in records:
+			if record.valid():
+				record_list = record.convert_to_list()
+				record_list.append(get_remaining_slots(record.id))
+				result.append(record_list)
+	return result
+
 def change_booking_data(id_, pladser):
 	with Session(engine) as session:
 		session.execute(update(Booking).where(Booking.id == id_).values(pladser=pladser))
